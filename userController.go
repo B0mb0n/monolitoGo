@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"monolito-go/models"
+	"monolitoGo/models"
 )
 
 type UserController struct {
