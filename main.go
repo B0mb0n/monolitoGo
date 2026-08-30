@@ -28,6 +28,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /users", userController.GetUsers)
 	mux.HandleFunc("GET /users/{id}", userController.GetUser)
+	mux.HandleFunc("POST /scan", controllers.ScanHandler)
 
 	log.Println("Servidor escuchando en :8080")
 	http.ListenAndServe(":8080", mux)
