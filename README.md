@@ -23,11 +23,11 @@ base de datos. Orquestado completamente con Docker Compose.
 ┌────────────────────────────────────────────────────────────────────┐
 │  MIDDLEWARE / GATEWAY (contenedor, puerto host 8080)               │
 │                                                                    │
-│  ┌──────────────┐   ┌────────────────┐   ┌──────────────────┐      │
-│  │   REGISTRY    ──▶  HEALTH CHECKS ──▶  LOAD BALANCER     │      │
+│  ┌───────────────┐  ┌────────────────┐   ┌──────────────────┐      │
+│  │   REGISTRY    ──▶  HEALTH CHECKS ──▶    LOAD BALANCER   │      │
 │  │ services.json │  │ goroutine, 5s  │   │  round robin     │      │
 │  │ doc. estático │  │ GET /health    │   │  sync.Mutex      │      │
-│  └──────────────┘   └────────────────┘   └──────────────────┘      │
+│  └───────────────┘  └────────────────┘   └──────────────────┘      │
 │                                                                    │
 │  Por cada módulo pedido: discovery → balanceo → forwardToService() │
 │  → junta resultados → responde JSON                                │
