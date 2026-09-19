@@ -14,32 +14,32 @@ base de datos. Orquestado completamente con Docker Compose.
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  FRONTEND (contenedor: nginx, puerto host 3000)                    │
-│  index.html + style.css + script.js                                │
-│  fetch() → POST http://localhost:8080/scan                         │
-└───────────────────────────┬──────────────────────────────────────┘
+│  FRONTEND (contenedor: nginx, puerto host 3000)                  │
+│  index.html + style.css + script.js                              │
+│  fetch() → POST http://localhost:8080/scan                       │
+└──────────────────────────────────────────────────────────────────┘
                              │  {target, modules[]}
                              ▼
-┌──────────────────────────────────────────────────────────────────┐
-│  MIDDLEWARE / GATEWAY (contenedor, puerto host 8080)                │
-│                                                                      │
-│  ┌──────────────┐   ┌────────────────┐   ┌──────────────────┐     │
-│  │   REGISTRY    │──▶│  HEALTH CHECKS │──▶│  LOAD BALANCER     │     │
-│  │ services.json │   │ goroutine, 5s   │   │  round robin       │     │
-│  │ doc. estático │   │ GET /health     │   │  sync.Mutex         │     │
-│  └──────────────┘   └────────────────┘   └──────────────────┘     │
-│                                                                      │
-│  Por cada módulo pedido: discovery → balanceo → forwardToService()   │
-│  → junta resultados → responde JSON                                  │
-└──────┬─────────────────┬───────────────────────┬────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  MIDDLEWARE / GATEWAY (contenedor, puerto host 8080)               │
+│                                                                    │
+│  ┌──────────────┐   ┌────────────────┐   ┌──────────────────┐      │
+│  │   REGISTRY    ──▶  HEALTH CHECKS ──▶  LOAD BALANCER     │      │
+│  │ services.json │  │ goroutine, 5s  │   │  round robin     │      │
+│  │ doc. estático │  │ GET /health    │   │  sync.Mutex      │      │
+│  └──────────────┘   └────────────────┘   └──────────────────┘      │
+│                                                                    │
+│  Por cada módulo pedido: discovery → balanceo → forwardToService() │
+│  → junta resultados → responde JSON                                │
+└────────────────────────────────────────────────────────────────────┘
        │ HTTP POST /scan  │ HTTP POST /scan       │ HTTP POST /scan
        ▼                  ▼                       ▼
-┌─────────────┐   ┌─────────────┐        ┌─────────────┐
-│ port-scan-1 │   │ http-scan-1 │        │ tls-scan-1  │
-│ port-scan-2 │   │ (Strategy)  │        │ (Factory)   │
-│ (Repository)│   └──────┬──────┘        └──────┬──────┘
-└──────┬──────┘          │                      │
-       └──────────────────┴──────────────────────┘
+┌─────────────┐     ┌─────────────┐        ┌─────────────┐
+│ port-scan-1 │     │ http-scan-1 │        │ tls-scan-1  │
+│ port-scan-2 │     │ (Strategy)  │        │ (Factory)   │
+│ (Repository)│     └──────┬──────┘        └──────┬──────┘
+└──────┬──────┘     
+       └──────────────────────────────────────────┘
                           │ INSERT INTO scan_results
                           ▼
                ┌─────────────────────┐
@@ -173,6 +173,3 @@ docker compose down -v       # además borra el volumen de la base de datos
 - Sin autenticación en ningún endpoint.
 - Configuración (DSN de Postgres, URL del middleware) hardcodeada en el
   código, no por variables de entorno.
-- Sin reintentos automáticos si una instancia falla a mitad de una
-  petición (aunque sí se detecta como caída en el siguiente chequeo de
-  salud, hasta 5s después).
