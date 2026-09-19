@@ -1,21 +1,58 @@
 services:
-  app:
-    build: .
-    container_name: monolito-app
+
+  # ---------- Frontend ----------
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - middleware
+
+  # ---------- Middleware / Gateway (service discovery + load balancer) ----------
+  middleware:
+    build: ./middleware
+    container_name: middleware
     ports:
       - "8080:8080"
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: monolito
-      APP_PORT: 8080
+    depends_on:
+      - port-scan-1
+      - port-scan-2
+      - http-scan-1
+      - tls-scan-1
+
+  # ---------- Backend: port-scan (2 réplicas) ----------
+  port-scan-1:
+    build: ./services/port-scan
+    container_name: port-scan-1
     depends_on:
       db:
         condition: service_healthy
-    restart: on-failure
 
+  port-scan-2:
+    build: ./services/port-scan
+    container_name: port-scan-2
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------- Backend: http-scan ----------
+  http-scan-1:
+    build: ./services/http-scan
+    container_name: http-scan-1
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------- Backend: tls-scan ----------
+  tls-scan-1:
+    build: ./services/tls-scan
+    container_name: tls-scan-1
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------- Base de datos compartida ----------
   db:
     image: postgres:16-alpine
     container_name: monolito-db

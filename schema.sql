@@ -1,14 +1,9 @@
--- Se ejecuta en automatico cuando se arranca el
--- contenedor de Postgres por primera vez.
+-- Se guarda una fila por cada escaneo que se ejecuta, en una sola tabla compartida por los 3 servicios: scan_results
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS scan_results (
     id         SERIAL PRIMARY KEY,
-    name       VARCHAR(100) NOT NULL,
-    email      VARCHAR(150) NOT NULL UNIQUE,
+    module     VARCHAR(50) NOT NULL, 	-- Qué tipo de escaneo lo generó
+    target     VARCHAR(255) NOT NULL, 	-- La IP/host que se escaneó
+    output     TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
-
--- Datos de ejemplo para probar.
-INSERT INTO users (name, email) VALUES
-    ('Aarón Salto', 'aaron@example.com'),
-    ('Alejandra', 'ale@example.com')

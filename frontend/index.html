@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Vulnerability Scanner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Vulnerability Scanner</h1>
+
+  <label>Target: <input id="target" value="192.168.1.20"></label>
+
+  <label><input type="checkbox" value="port_scan" checked> Port Scan</label>
+  <label><input type="checkbox" value="http_scan" checked> HTTP Scan</label>
+  <label><input type="checkbox" value="tls_scan" checked> TLS Scan</label>
+
+  <button id="scanBtn">Escanear</button>
+
+  <pre id="output">Esperando...</pre>
+
+  <script src="script.js"></script>
+</body>
+</html>

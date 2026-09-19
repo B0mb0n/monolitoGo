@@ -1,0 +1,12 @@
+{
+  "port_scan": [
+    { "name": "port-scan-1", "url": "http://port-scan-1:9001" },
+    { "name": "port-scan-2", "url": "http://port-scan-2:9001" }
+  ],
+  "http_scan": [
+    { "name": "http-scan-1", "url": "http://http-scan-1:9002" }
+  ],
+  "tls_scan": [
+    { "name": "tls-scan-1", "url": "http://tls-scan-1:9003" }
+  ]
+}

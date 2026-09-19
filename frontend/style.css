@@ -1,0 +1,98 @@
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 0 20px;
+  background: #0d1117;
+  color: #e6edf3;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #30363d;
+  padding-bottom: 12px;
+}
+
+label {
+  display: block;
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: #c9d1d9;
+}
+
+input[type="text"],
+input:not([type]) {
+  margin-top: 6px;
+  width: 100%;
+  padding: 8px 10px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input:not([type]):focus {
+  outline: none;
+  border-color: #58a6ff;
+}
+
+label:has(input[type="checkbox"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  margin-right: 10px;
+  padding: 6px 10px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  accent-color: #58a6ff;
+  width: 16px;
+  height: 16px;
+}
+
+/* Botón principal */
+button {
+  display: block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #238636;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+button:hover {
+  background: #2ea043;
+}
+
+button:active {
+  background: #1a6e2c;
+}
+
+/* Caja de resultados, estilo "terminal" */
+
+pre {
+  margin-top: 20px;
+  background: #010409;
+  color: #3fb950;
+  padding: 16px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}

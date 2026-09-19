@@ -1,4 +1,4 @@
-module monolitoGo
+module portscan
 
 go 1.22.2
 
