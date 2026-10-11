@@ -7,19 +7,40 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - middleware
+      - nginx-gateway
 
-  # ---------- Middleware / Gateway (service discovery + load balancer) ----------
-  middleware:
-    build: ./middleware
-    container_name: middleware
+  # ---------- Reverse proxy / Load balancer (nginx) ----------
+  # Único punto de entrada: el frontend le habla a este contenedor (8080)
+  # y él reparte entre los middlewares.
+  nginx-gateway:
+    build: ./nginx-gateway
+    container_name: nginx-gateway
     ports:
-      - "8080:8080"
+      - "8080:80"
+    depends_on:
+      - middleware-1
+      - middleware-2
+
+  # ---------- Middleware (service discovery + load balancer), 2 réplicas ----------
+  # Ya no publican puertos al host: solo nginx-gateway puede llegar a ellos.
+  middleware-1:
+    build: ./middleware
+    container_name: middleware-1
     depends_on:
       - port-scan-1
       - port-scan-2
       - http-scan-1
       - tls-scan-1
+
+  middleware-2:
+    build: ./middleware
+    container_name: middleware-2
+    depends_on:
+      - port-scan-1
+      - port-scan-2
+      - http-scan-1
+      - tls-scan-1
+
 
   # ---------- Backend: port-scan (2 réplicas) ----------
   port-scan-1:
