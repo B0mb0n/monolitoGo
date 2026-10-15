@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	_ "github.com/lib/pq"
+
+	"monolito/shared"
 )
 
 type scanRequest struct {
@@ -65,6 +67,8 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(result)
 	})
+
+	shared.RegisterWithConsul() // alta en Consul (con health check) y baja al apagarse
 
 	log.Println("tls-scan-service escuchando en :9003")
 	log.Fatal(http.ListenAndServe(":9003", mux))

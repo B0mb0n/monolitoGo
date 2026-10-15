@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	_ "github.com/lib/pq"
+
+	"monolito/shared"
 )
 
 // scanRequest es lo que este servicio recibe del middleware.
@@ -60,6 +62,8 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(result)
 	})
+
+	shared.RegisterWithConsul() // alta en Consul (con health check) y baja al apagarse
 
 	log.Println("port-scan-service escuchando en :9001")
 	log.Fatal(http.ListenAndServe(":9001", mux))

@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 )
 
 // Define la estructura exacta del JSON que enviará el frontend cuando el usuario pulse el botón de escanear.
@@ -16,10 +15,7 @@ type scanRequest struct {
 	Modules []string `json:"modules"`
 }
 
-var (
-	registry *Registry		// Variable global que contendrá el directorio de servicios estáticos y sus estados de salud.
-	lb       = NewLoadBalancer()	// Crea la instancia global del balanceador de carga utilizando el algoritmo Round Robin que esta en loadbalancer.
-)
+var lb = NewLoadBalancer() // Crea la instancia global del balanceador de carga utilizando el algoritmo Round Robin que esta en loadbalancer.
 
 // forwardToService manda la petición HTTP a la instancia elegida y regresa el JSON que esa instancia respondió.
 
@@ -75,8 +71,8 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, module := range req.Modules {
 
-		// 1. Service discovery: ¿qué instancias sanas hay para este módulo?
-		instances := registry.HealthyInstances(module)
+		// 1. Service discovery (consul): ¿qué instancias sanas hay para este módulo?
+		instances := healthyInstances(module)
 
 		// 2. Load balancing: ¿a cuál de ellas le toca esta petición?
 		instance, ok := lb.Next(module, instances)
@@ -103,15 +99,6 @@ func scanHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	var err error // Capturar errores de arranque
-	registry, err = loadStaticRegistry("services.json")
-	if err != nil {
-		log.Fatalf("no se pudo cargar services.json: %v", err)
-	}
-
-	// Revisa salud de cada instancia cada 5 segundos.
-	registry.StartHealthChecks(5 * time.Second)
-
 	// Multiplexor para gestionar las rutas.
 	mux := http.NewServeMux()
 	mux.HandleFunc("/scan", enableCORS(scanHandler))

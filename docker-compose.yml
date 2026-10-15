@@ -21,57 +21,101 @@ services:
       - middleware-1
       - middleware-2
 
-  # ---------- Middleware (service discovery + load balancer), 2 réplicas ----------
+  # ---------- Middleware (descubre servicios en Consul + load balancer), 2 réplicas ----------
   # Ya no publican puertos al host: solo nginx-gateway puede llegar a ellos.
+
   middleware-1:
     build: ./middleware
     container_name: middleware-1
+    environment:
+      CONSUL_HTTP_ADDR: http://consul:8500
     depends_on:
-      - port-scan-1
-      - port-scan-2
-      - http-scan-1
-      - tls-scan-1
+      - consul
 
   middleware-2:
     build: ./middleware
     container_name: middleware-2
+    environment:
+      CONSUL_HTTP_ADDR: http://consul:8500
     depends_on:
-      - port-scan-1
-      - port-scan-2
-      - http-scan-1
-      - tls-scan-1
+      - consul
 
+  # ---------- Consul (service registry + health checks) ----------
+  # Modo dev: un solo nodo, en memoria. UI en http://localhost:8500/ui
+
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul
+    command: "agent -dev -client=0.0.0.0 -ui"
+    ports:
+      - "8500:8500"
 
   # ---------- Backend: port-scan (2 réplicas) ----------
   port-scan-1:
-    build: ./services/port-scan
+    build:
+      context: ./services
+      dockerfile: port-scan/Dockerfile
     container_name: port-scan-1
+    environment:
+      CONSUL_HTTP_ADDR: http://consul:8500
+      SERVICE_NAME: port_scan
+      INSTANCE_ID: port-scan-1
+      SERVICE_PORT: 9001
     depends_on:
       db:
         condition: service_healthy
+      consul:
+        condition: service_started
 
   port-scan-2:
-    build: ./services/port-scan
+    build:
+      context: ./services
+      dockerfile: port-scan/Dockerfile
     container_name: port-scan-2
+    environment:
+      CONSUL_HTTP_ADDR: http://consul:8500
+      SERVICE_NAME: port_scan
+      INSTANCE_ID: port-scan-2
+      SERVICE_PORT: 9001
     depends_on:
       db:
         condition: service_healthy
+      consul:
+        condition: service_started
 
   # ---------- Backend: http-scan ----------
   http-scan-1:
-    build: ./services/http-scan
+    build:
+      context: ./services
+      dockerfile: http-scan/Dockerfile
     container_name: http-scan-1
+    environment:
+      CONSUL_HTTP_ADDR: http://consul:8500
+      SERVICE_NAME: http_scan
+      INSTANCE_ID: http-scan-1
+      SERVICE_PORT: 9002
     depends_on:
       db:
         condition: service_healthy
+      consul:
+        condition: service_started
 
   # ---------- Backend: tls-scan ----------
   tls-scan-1:
-    build: ./services/tls-scan
+    build:
+      context: ./services
+      dockerfile: tls-scan/Dockerfile
     container_name: tls-scan-1
+    environment:
+      CONSUL_HTTP_ADDR: http://consul:8500
+      SERVICE_NAME: tls_scan
+      INSTANCE_ID: tls-scan-1
+      SERVICE_PORT: 9003
     depends_on:
       db:
         condition: service_healthy
+      consul:
+        condition: service_started
 
   # ---------- Base de datos compartida ----------
   db:
